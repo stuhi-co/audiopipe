@@ -30,6 +30,14 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
+// ort rc.12: SessionBuilder methods return Error<SessionBuilder>; drop the builder.
+#[cfg(feature = "onnx-deps")]
+impl From<ort::Error<ort::session::builder::SessionBuilder>> for Error {
+    fn from(e: ort::Error<ort::session::builder::SessionBuilder>) -> Self {
+        Error::Ort(e.into())
+    }
+}
+
 impl Error {
     /// True when [`Error::ModelNotCached`] — caller may spawn [`crate::Model::spawn_pretrained_download`].
     pub fn is_model_not_cached(&self) -> bool {
